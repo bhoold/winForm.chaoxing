@@ -111,6 +111,9 @@
             this.Controls.Add(this.textBoxSearch);
             this.Controls.Add(this.gridViewSchool);
             this.Controls.Add(this.gridViewRegion);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "FormSchool";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;

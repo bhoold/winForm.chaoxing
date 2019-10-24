@@ -16,7 +16,7 @@ using System.Security.Cryptography.X509Certificates;
 namespace WindowsForms.chaoxing
 {
     //zetee
-    //不能Host、Connection、User-Agent、Referer、Range、Content-Type、Content-Length、Expect、Proxy-Connection、If-Modified-Since
+    //不能通过headers字符串设置Host、Connection、User-Agent、Referer、Range、Content-Type、Content-Length、Expect、Proxy-Connection、If-Modified-Since
     //等header. 这些header都是通过属性来设置的 。
     public class HttpRequestClient
     {
@@ -44,24 +44,20 @@ namespace WindowsForms.chaoxing
         /// 默认的头
         /// </summary>
         public static string defaultHeaders = @"
-Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
-Accept-Encoding: gzip, deflate, br
-Accept-Language: zh-CN,zh;q=0.9
-Cache-Control: no-cache
-Connection: keep-alive
-Host: localhost
-Pragma: no-cache
-Sec-Fetch-Mode: navigate
-Sec-Fetch-Site: none
-Sec-Fetch-User: ?1
-Upgrade-Insecure-Requests: 1
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/77.0.3865.120 Safari/537.36
-";
+                Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3
+                Accept-Encoding: gzip, deflate
+                Accept-Language: zh-CN,zh;q=0.9
+                Cache-Control: no-cache
+                Connection: keep-alive
+                Pragma: no-cache
+                Upgrade-Insecure-Requests: 1
+                User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.70 Safari/537.36
+            ";//Host: Localhost
 
         /// <summary>
         /// 是否跟踪cookies
         /// </summary>
-        bool isTrackCookies = false;
+        bool isTrackCookies = true;
         /// <summary>
         /// cookies 字典
         /// </summary>
@@ -96,7 +92,7 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
             }
         }
 
-        public HttpRequestClient(bool isTrackCookies = false)
+        public HttpRequestClient(bool isTrackCookies = true)
         {
             this.isTrackCookies = isTrackCookies;
         }
@@ -112,6 +108,11 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
         /// <returns></returns>
         public Stream httpStream(string url, string method, string headers, string content, Encoding contentEncode, string proxyUrl)
         {
+            if (string.IsNullOrEmpty(headers) || string.IsNullOrWhiteSpace(headers))
+            {
+                headers = defaultHeaders;
+            }
+
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = method;
             if (method.Equals("GET", StringComparison.InvariantCultureIgnoreCase))
@@ -154,13 +155,18 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
                 string cookieString = response.Headers[HttpResponseHeader.SetCookie];
                 if (!string.IsNullOrWhiteSpace(cookieString))
                 {
-                    var spilit = cookieString.Split(';');
-                    foreach (string item in spilit)
+                    var segments = cookieString.Split(',');
+                    foreach(string segment in segments)
                     {
-                        var kv = item.Split('=');
-                        if (kv.Length == 2)
-                            cc.Add(new Cookie(kv[0].Trim(), kv[1].Trim()));
+                        var spilit = segment.Split(';');
+                        foreach (string item in spilit)
+                        {
+                            var kv = item.Split('=');
+                            if (kv.Length == 2 && kv[0].ToLower() != "path")
+                                cc.Add(new Cookie(kv[0].Trim(), kv[1].Trim()));
+                        }
                     }
+
                 }
                 trackCookies(cc);
             }
@@ -199,6 +205,10 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
                 request = WebRequest.Create(url) as HttpWebRequest;
             }*/
 
+            if (string.IsNullOrEmpty(headers) || string.IsNullOrWhiteSpace(headers))
+            {
+                headers = defaultHeaders;
+            }
 
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = method;
@@ -241,13 +251,18 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
                 string cookieString = response.Headers[HttpResponseHeader.SetCookie];
                 if (!string.IsNullOrWhiteSpace(cookieString))
                 {
-                    var spilit = cookieString.Split(';');
-                    foreach (string item in spilit)
+                    var segments = cookieString.Split(',');
+                    foreach (string segment in segments)
                     {
-                        var kv = item.Split('=');
-                        if (kv.Length == 2)
-                            cc.Add(new Cookie(kv[0].Trim(), kv[1].Trim()));
+                        var spilit = segment.Split(';');
+                        foreach (string item in spilit)
+                        {
+                            var kv = item.Split('=');
+                            if (kv.Length == 2 && kv[0].ToLower() != "path")
+                                cc.Add(new Cookie(kv[0].Trim(), kv[1].Trim()));
+                        }
                     }
+
                 }
                 trackCookies(cc);
             }
@@ -271,7 +286,7 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
         /// <param name="contentEncode"></param>
         /// <param name="proxyUrl"></param>
         /// <returns></returns>
-        public string httpPost(string url, string headers, string content, Encoding contentEncode, string proxyUrl = null)
+        public string httpPost(string url, string headers = null, string content = null, Encoding contentEncode = null, string proxyUrl = null)
         {
             return http(url, "POST", headers, content, contentEncode, proxyUrl);
         }
@@ -284,9 +299,9 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
         /// <param name="content"></param>
         /// <param name="proxyUrl"></param>
         /// <returns></returns>
-        public string httpGet(string url, string headers, string content = null, string proxyUrl = null)
+        public string httpGet(string url, string headers = null, string content = null, string proxyUrl = null)
         {
-            return http(url, "GET", headers, null, null, proxyUrl);
+            return http(url, "GET", headers, content, null, proxyUrl);
         }
 
         /// <summary>
@@ -439,6 +454,10 @@ User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML,
                     }
                     #endregion
                 }
+            }
+            if (string.IsNullOrEmpty(request.Headers["Host"]))
+            {
+                request.Host = request.Address.Host;
             }
             CookieCollection cc = new CookieCollection();
             string cookieString = request.Headers[HttpRequestHeader.Cookie];

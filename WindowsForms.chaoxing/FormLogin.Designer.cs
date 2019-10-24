@@ -54,9 +54,9 @@
             // 
             // textBoxSchool
             // 
-            this.textBoxSchool.Enabled = false;
             this.textBoxSchool.Location = new System.Drawing.Point(89, 27);
             this.textBoxSchool.Name = "textBoxSchool";
+            this.textBoxSchool.ReadOnly = true;
             this.textBoxSchool.Size = new System.Drawing.Size(195, 21);
             this.textBoxSchool.TabIndex = 1;
             // 
@@ -122,7 +122,7 @@
             this.btnLogin.Location = new System.Drawing.Point(89, 178);
             this.btnLogin.Name = "btnLogin";
             this.btnLogin.Size = new System.Drawing.Size(75, 23);
-            this.btnLogin.TabIndex = 9;
+            this.btnLogin.TabIndex = 0;
             this.btnLogin.Text = "登录";
             this.btnLogin.UseVisualStyleBackColor = true;
             this.btnLogin.Click += new System.EventHandler(this.btnLogin_Click);
@@ -153,6 +153,9 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.textBoxSchool);
             this.Controls.Add(this.btnSelSchool);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "FormLogin";
             this.ShowInTaskbar = false;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
