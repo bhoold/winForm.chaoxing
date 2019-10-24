@@ -10,11 +10,17 @@ using System.Windows.Forms;
 
 namespace WindowsForms.chaoxing
 {
-    public partial class Form1 : Form
+    public partial class FormMain : Form
     {
-        public Form1()
+        public FormMain()
         {
             InitializeComponent();
+        }
+
+        private void menuitemLogin_Click(object sender, EventArgs e)
+        {
+            FormLogin form = new FormLogin();
+            form.ShowDialog();
         }
     }
 }
