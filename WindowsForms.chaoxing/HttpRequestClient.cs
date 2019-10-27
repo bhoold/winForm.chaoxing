@@ -63,6 +63,7 @@ namespace WindowsForms.chaoxing
         /// </summary>
         Dictionary<String, Cookie> cookieDic = new Dictionary<string, Cookie>();
 
+        CookieCollection cookieCt = new CookieCollection();
         /// <summary>
         /// 平均相应时间
         /// </summary>
@@ -156,15 +157,56 @@ namespace WindowsForms.chaoxing
                 if (!string.IsNullOrWhiteSpace(cookieString))
                 {
                     var segments = cookieString.Split(',');
-                    foreach(string segment in segments)
+                    List<string> segments2 = new List<string>();
+                    for (int i = 0; i < segments.Count();)
+                    {
+                        if (segments[i].IndexOf("Expires") > 0)
+                        {
+                            segments[i] = string.Concat(segments[i], segments[i + 1]);
+                            segments2.Add(segments[i]);
+                            i += 2;
+                        }
+                        else
+                        {
+                            segments2.Add(segments[i]);
+                            i++;
+                        }
+                    }
+                    segments = segments2.ToArray();
+                    foreach (string segment in segments)
                     {
                         var spilit = segment.Split(';');
+                        Cookie cookie = new Cookie();
+                        bool isHasDomain = false;
                         foreach (string item in spilit)
                         {
                             var kv = item.Split('=');
-                            if (kv.Length == 2 && kv[0].ToLower() != "path")
-                                cc.Add(new Cookie(kv[0].Trim(), kv[1].Trim()));
+                            switch (kv[0].Trim())
+                            {
+                                case "Domain":
+                                    cookie.Domain = kv[1].Trim();
+                                    isHasDomain = true;
+                                    break;
+                                case "Expires":
+                                    cookie.Expires = DateTime.Parse(kv[1].Trim());
+                                    break;
+                                case "Path":
+                                    cookie.Path = kv[1].Trim();
+                                    break;
+                                case "HttpOnly":
+                                    cookie.HttpOnly = true;
+                                    break;
+                                default:
+                                    cookie.Name = kv[0].Trim();
+                                    cookie.Value = kv[1].Trim();
+                                    break;
+                            }
                         }
+                        if (!isHasDomain)
+                        {
+                            cookie.Domain = response.ResponseUri.Host;
+                        }
+                        cc.Add(cookie);
                     }
 
                 }
@@ -252,15 +294,56 @@ namespace WindowsForms.chaoxing
                 if (!string.IsNullOrWhiteSpace(cookieString))
                 {
                     var segments = cookieString.Split(',');
+                    List<string> segments2 = new List<string>();
+                    for (int i = 0; i < segments.Count();)
+                    {
+                        if(segments[i].IndexOf("Expires") > 0)
+                        {
+                            segments[i] = string.Concat(segments[i], segments[i+1]);
+                            segments2.Add(segments[i]);
+                            i += 2;
+                        }
+                        else
+                        {
+                            segments2.Add(segments[i]);
+                            i++;
+                        }
+                    }
+                    segments = segments2.ToArray();
                     foreach (string segment in segments)
                     {
                         var spilit = segment.Split(';');
+                        Cookie cookie = new Cookie();
+                        bool isHasDomain = false;
                         foreach (string item in spilit)
                         {
                             var kv = item.Split('=');
-                            if (kv.Length == 2 && kv[0].ToLower() != "path")
-                                cc.Add(new Cookie(kv[0].Trim(), kv[1].Trim()));
+                            switch (kv[0].Trim())
+                            {
+                                case "Domain":
+                                    cookie.Domain = kv[1].Trim();
+                                    isHasDomain = true;
+                                    break;
+                                case "Expires":
+                                    cookie.Expires = DateTime.Parse(kv[1].Trim());
+                                    break;
+                                case "Path":
+                                    cookie.Path = kv[1].Trim();
+                                    break;
+                                case "HttpOnly":
+                                    cookie.HttpOnly = true;
+                                    break;
+                                default:
+                                    cookie.Name = kv[0].Trim();
+                                    cookie.Value = kv[1].Trim();
+                                    break;
+                            }
                         }
+                        if (!isHasDomain)
+                        {
+                            cookie.Domain = response.ResponseUri.Host;
+                        }
+                        cc.Add(cookie);
                     }
 
                 }
@@ -338,7 +421,7 @@ namespace WindowsForms.chaoxing
                     cookieDic.Add(c.Name, c);
                 }
             }
-
+            cookieCt.Add(cookies);
         }
 
         /// <summary>
@@ -479,6 +562,11 @@ namespace WindowsForms.chaoxing
             else
             {
                 request.Headers[HttpRequestHeader.Cookie] = getCookieStr();
+                /*
+                CookieContainer cookContner = new CookieContainer();
+                cookContner.Add(cookieCt);
+                request.CookieContainer = cookContner;
+                */
             }
 
             #region 打印头

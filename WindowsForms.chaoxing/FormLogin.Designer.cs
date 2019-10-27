@@ -102,13 +102,16 @@
             this.textBoxAccount.Name = "textBoxAccount";
             this.textBoxAccount.Size = new System.Drawing.Size(291, 21);
             this.textBoxAccount.TabIndex = 6;
+            this.textBoxAccount.Text = "19925248455";
             // 
             // textBoxPassword
             // 
             this.textBoxPassword.Location = new System.Drawing.Point(89, 97);
             this.textBoxPassword.Name = "textBoxPassword";
+            this.textBoxPassword.PasswordChar = '*';
             this.textBoxPassword.Size = new System.Drawing.Size(291, 21);
             this.textBoxPassword.TabIndex = 7;
+            this.textBoxPassword.Text = "liuxing111111";
             // 
             // textBoxCode
             // 

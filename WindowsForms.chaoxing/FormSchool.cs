@@ -217,7 +217,7 @@ namespace WindowsForms.chaoxing
         {
             if (string.IsNullOrEmpty(selectedRowData))
             {
-                MessageBox.Show("请选择学校");
+                MessageBox.Show("请选择学校", "系统提示", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
             }
             else
             {
