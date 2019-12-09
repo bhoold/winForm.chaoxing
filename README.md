@@ -1,9 +1,9 @@
-## ¿ª·¢»·¾³
+## å¼€å‘ç¯å¢ƒ
 
 vs2017
 
 
-## ½ØÍ¼
+## æˆªå›¾
 
 ![SharedScreenshot.jpg](https://github.com/bhoold/winForm.chaoxing/raw/master/screenshots/SharedScreenshot.jpg)
 
